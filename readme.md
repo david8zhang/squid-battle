@@ -1,3 +1,3 @@
-# Phaser 3 Typescript Boilerplate
+# Squid Battle
 
-- Based on Ourcade's boilerplate, with a few additional modifications to support DOM element UI out of the box, as well as some package.json version configurations to support easy deployment with Netlify
+A tactical turn-based game involving squids. Spread ink across the map and dominate the enemy! Project for [Mini-Jam 143](https://itch.io/jam/mini-jam-143-ink)
