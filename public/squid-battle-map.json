@@ -1,0 +1,58 @@
+{
+  "compressionlevel": -1,
+  "editorsettings": {
+    "export": {
+      "format": "json",
+      "target": "squid-battle-map.json"
+    }
+  },
+  "height": 10,
+  "infinite": false,
+  "layers": [
+    {
+      "data": [
+        8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+        8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+        8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+        8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+        8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+        8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+        8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8
+      ],
+      "height": 10,
+      "id": 1,
+      "name": "Ground",
+      "opacity": 1,
+      "type": "tilelayer",
+      "visible": true,
+      "width": 20,
+      "x": 0,
+      "y": 0
+    }
+  ],
+  "nextlayerid": 2,
+  "nextobjectid": 1,
+  "orientation": "orthogonal",
+  "renderorder": "right-down",
+  "tiledversion": "1.4.3",
+  "tileheight": 60,
+  "tilesets": [
+    {
+      "columns": 14,
+      "firstgid": 1,
+      "image": "./squid-battle-tiles.png",
+      "imageheight": 704,
+      "imagewidth": 896,
+      "margin": 0,
+      "name": "squid-battle-tiles",
+      "spacing": 0,
+      "tilecount": 154,
+      "tileheight": 64,
+      "tilewidth": 64
+    }
+  ],
+  "tilewidth": 60,
+  "type": "map",
+  "version": 1.4,
+  "width": 20
+}
