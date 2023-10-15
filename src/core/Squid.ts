@@ -14,8 +14,14 @@ export class Squid {
 
   constructor(game: Game, config: SquidConfig) {
     this.game = game
-    this.sprite = this.game.add
-      .sprite(config.position.x, config.position.y, config.texture)
-      .setOrigin(0)
+    this.sprite = this.game.add.sprite(config.position.x, config.position.y, config.texture)
+  }
+
+  get x() {
+    return this.sprite.x
+  }
+
+  get y() {
+    return this.sprite.y
   }
 }

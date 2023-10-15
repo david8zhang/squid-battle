@@ -8,6 +8,7 @@ export class Preload extends Phaser.Scene {
     this.load.image('squid-battle-tiles', 'squid-battle-tiles.png')
     this.load.image('green-character', 'green_character.png')
     this.load.image('red-character', 'red_character.png')
+    this.load.image('cursor', 'cursor.png')
   }
 
   create() {

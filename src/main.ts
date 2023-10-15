@@ -2,11 +2,12 @@ import Phaser from 'phaser'
 
 import { Game } from './scenes/Game'
 import { Preload } from './scenes/Preload'
+import { Constants } from './utils/Constants'
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
-  width: 800,
-  height: 500,
+  width: Constants.WINDOW_WIDTH,
+  height: Constants.WINDOW_HEIGHT,
   parent: 'phaser',
   physics: {
     default: 'arcade',
