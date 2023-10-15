@@ -24,13 +24,9 @@ export class Grid {
   initGrid(config: GridConfig) {
     const numCellsWidth = config.width / config.cellSize
     const numCellsHeight = config.height / config.cellSize
-
     let xPos = 0
     let yPos = 0
     this.grid = new Array(numCellsHeight).fill(null).map(() => new Array(numCellsWidth).fill(null))
-
-    console.log(this.grid)
-
     for (let i = 0; i < numCellsHeight; i++) {
       xPos = 0
       for (let j = 0; j < numCellsWidth; j++) {

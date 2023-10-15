@@ -1,11 +1,14 @@
 import { Constants } from '~/utils/Constants'
 import { Player } from './Player'
 import { Grid } from '~/core/Grid'
+import { Side } from '~/utils/Side'
+import { Squid } from '~/core/Squid'
 
 export class Game extends Phaser.Scene {
   public tileMap!: Phaser.Tilemaps.Tilemap
   public player!: Player
   public grid!: Grid
+  public currTurn: Side = Side.PLAYER
 
   constructor() {
     super('game')
@@ -25,6 +28,24 @@ export class Game extends Phaser.Scene {
       x: tile.pixelX,
       y: tile.pixelY,
     }
+  }
+
+  getAllLivingUnits() {
+    const livingPlayerUnits = this.player.party
+    // const livingCPUUnits = this.cpu.getLivingUnits()
+    return livingPlayerUnits
+  }
+
+  unitAtPosition(row: number, col: number, currUnit: Squid) {
+    const allUnits = this.getAllLivingUnits()
+    for (let i = 0; i < allUnits.length; i++) {
+      const unit = allUnits[i]
+      const rowCol = unit.getRowCol()
+      if (rowCol.row === row && rowCol.col === col && currUnit !== unit) {
+        return true
+      }
+    }
+    return false
   }
 
   initGrid() {
