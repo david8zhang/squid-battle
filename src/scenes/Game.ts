@@ -147,7 +147,9 @@ export class Game extends Phaser.Scene {
   goToNextLevel() {
     this.turnsRemaining = Constants.TOTAL_TURNS
     if (this.currLevelIndex == Constants.ALL_CPU_PARTY_MEMBER_CONFIGS.length - 1) {
-      // Go to thanks for playing screen
+      GameUI.instance.tweenGameOverModalOut(() => {
+        this.scene.start('end')
+      })
     } else {
       this.currLevelIndex++
       GameUI.instance.tweenGameOverModalOut(() => {
