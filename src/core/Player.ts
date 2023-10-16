@@ -376,4 +376,11 @@ export class Player {
       }
     }
   }
+
+  resetParty() {
+    this.party.forEach((squid) => {
+      squid.destroy()
+    })
+    this.initParty()
+  }
 }

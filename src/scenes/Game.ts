@@ -16,7 +16,8 @@ export class Game extends Phaser.Scene {
   public grid!: Grid
   public currTurn: Side = Side.PLAYER
   public actionMenu!: ActionMenu
-  public turnsRemaining: number = 0
+  public turnsRemaining: number = Constants.TOTAL_TURNS
+  public currLevelIndex: number = 0
 
   constructor() {
     super('game')
@@ -118,6 +119,51 @@ export class Game extends Phaser.Scene {
     }
     if (cell.centerY <= cameraUpperBound) {
       camera.scrollY -= Constants.TILE_SIZE
+    }
+  }
+
+  calculatePercentages() {
+    let totalPlayerTiles = 0
+    let totalCPUTiles = 0
+    const layer = this.tileMap.getLayer('Ground')
+    for (let i = 0; i < layer.data.length; i++) {
+      for (let j = 0; j < layer.data[0].length; j++) {
+        const tile = layer.data[i][j]
+        if (tile.tint == Constants.PLAYER_INK_COLOR) {
+          totalPlayerTiles++
+        }
+        if (tile.tint == Constants.CPU_INK_COLOR) {
+          totalCPUTiles++
+        }
+      }
+    }
+    const totalTiles = layer.data.length * layer.data[0].length
+    return {
+      playerPct: totalPlayerTiles / totalTiles,
+      cpuPct: totalCPUTiles / totalTiles,
+    }
+  }
+
+  goToNextLevel() {
+    this.turnsRemaining = Constants.TOTAL_TURNS
+    if (this.currLevelIndex == Constants.ALL_CPU_PARTY_MEMBER_CONFIGS.length - 1) {
+      // Go to thanks for playing screen
+    } else {
+      this.currLevelIndex++
+      GameUI.instance.tweenGameOverModalOut(() => {
+        this.player.resetParty()
+        this.cpu.resetParty()
+      })
+      const layer = this.tileMap.getLayer('Ground')
+      for (let i = 0; i < layer.data.length; i++) {
+        for (let j = 0; j < layer.data[0].length; j++) {
+          const tile = layer.data[i][j]
+          tile.tint = 0xffffff
+          tile.setAlpha(1)
+        }
+      }
+      this.currTurn = Side.PLAYER
+      this.player.startTurn()
     }
   }
 }

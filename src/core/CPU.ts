@@ -80,7 +80,7 @@ export class CPU {
   }
 
   initParty() {
-    this.party = Constants.CPU_PARTY_MEMBER_CONFIGS.map((squid) => {
+    this.party = Constants.ALL_CPU_PARTY_MEMBER_CONFIGS[this.game.currLevelIndex].map((squid) => {
       const { tilePosition } = squid
       const cell = this.game.grid.getCellAtRowCol(tilePosition.y, tilePosition.x)
       return new Squid(this.game, {
@@ -92,5 +92,12 @@ export class CPU {
         side: Side.CPU,
       })
     })
+  }
+
+  resetParty() {
+    this.party.forEach((squid) => {
+      squid.destroy()
+    })
+    this.initParty()
   }
 }

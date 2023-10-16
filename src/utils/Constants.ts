@@ -10,26 +10,111 @@ export class Constants {
   public static readonly WINDOW_HEIGHT = 600
   public static readonly TILE_SIZE = 60
 
-  public static CPU_PARTY_MEMBER_CONFIGS = [
+  public static LEVEL_1_CPU_PARTY_CONFIGS = [
     {
       tilePosition: {
-        x: 4,
+        x: 17,
         y: 2,
       },
     },
     {
       tilePosition: {
-        x: 4,
+        x: 17,
         y: 3,
       },
     },
     {
       tilePosition: {
-        x: 4,
+        x: 17,
         y: 4,
       },
     },
   ]
+
+  public static LEVEL_2_CPU_PARTY_CONFIGS = [
+    {
+      tilePosition: {
+        x: 17,
+        y: 1,
+      },
+    },
+    {
+      tilePosition: {
+        x: 17,
+        y: 2,
+      },
+    },
+    {
+      tilePosition: {
+        x: 17,
+        y: 3,
+      },
+    },
+    {
+      tilePosition: {
+        x: 17,
+        y: 4,
+      },
+    },
+    {
+      tilePosition: {
+        x: 17,
+        y: 5,
+      },
+    },
+  ]
+
+  public static LEVEL_3_CPU_PARTY_CONFIGS = [
+    {
+      tilePosition: {
+        x: 17,
+        y: 1,
+      },
+    },
+    {
+      tilePosition: {
+        x: 17,
+        y: 2,
+      },
+    },
+    {
+      tilePosition: {
+        x: 17,
+        y: 3,
+      },
+    },
+    {
+      tilePosition: {
+        x: 17,
+        y: 4,
+      },
+    },
+    {
+      tilePosition: {
+        x: 17,
+        y: 5,
+      },
+    },
+    {
+      tilePosition: {
+        x: 17,
+        y: 6,
+      },
+    },
+    {
+      tilePosition: {
+        x: 17,
+        y: 7,
+      },
+    },
+  ]
+
+  public static ALL_CPU_PARTY_MEMBER_CONFIGS = [
+    Constants.LEVEL_1_CPU_PARTY_CONFIGS,
+    Constants.LEVEL_2_CPU_PARTY_CONFIGS,
+    Constants.LEVEL_3_CPU_PARTY_CONFIGS,
+  ]
+
   public static PLAYER_PARTY_MEMBER_CONFIGS = [
     {
       tilePosition: {
@@ -50,4 +135,10 @@ export class Constants {
       },
     },
   ]
+
+  public static readonly FONT_FAMILY = 'Kaph'
+
+  public static centerText(xToCenterOn: number, text: Phaser.GameObjects.Text) {
+    text.setPosition(xToCenterOn - text.displayWidth / 2, text.y)
+  }
 }

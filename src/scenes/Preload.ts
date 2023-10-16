@@ -12,10 +12,10 @@ export class Preload extends Phaser.Scene {
     this.load.image('attack-cursor', 'attack-cursor.png')
     this.load.image('squid', 'squid.png')
     this.load.image('squid-knocked-out', 'squid-knocked-out.png')
+    this.load.image('splash', 'splash.jpg')
   }
 
   create() {
-    this.scene.start('game')
-    this.scene.start('game-ui')
+    this.scene.start('start')
   }
 }

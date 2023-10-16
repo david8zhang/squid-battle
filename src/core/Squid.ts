@@ -292,4 +292,9 @@ export class Squid {
       return distance == 1
     })
   }
+
+  destroy() {
+    this.sprite.destroy()
+    this.miniHPBar.destroy()
+  }
 }

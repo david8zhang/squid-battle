@@ -1,4 +1,5 @@
 import { Game } from '~/scenes/Game'
+import { Constants } from '~/utils/Constants'
 
 export interface OptionConfig {
   optionText: string
@@ -25,11 +26,12 @@ export class ActionMenu {
         .text(position.x + 10, yPos, optionConfig.optionText, {
           fontSize: '15px',
           color: 'black',
+          fontFamily: Constants.FONT_FAMILY,
         })
         .setDepth(1000)
         .setOrigin(0, 0.5)
       const option = this.game.add
-        .rectangle(position.x, yPos, 110, 25)
+        .rectangle(position.x, yPos, 140, 25)
         .setStrokeStyle(1, 0x000000)
         .setFillStyle(0xffffff)
         .setInteractive()
