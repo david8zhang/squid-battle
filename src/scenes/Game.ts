@@ -1,17 +1,36 @@
 import { Constants } from '~/utils/Constants'
-import { Player } from './Player'
+import { Player } from '../core/Player'
 import { Grid } from '~/core/Grid'
 import { Side } from '~/utils/Side'
 import { Squid } from '~/core/Squid'
+import { ActionMenu } from '~/core/ActionMenu'
+import { CPU } from '~/core/CPU'
+import { GameUI } from './GameUI'
 
 export class Game extends Phaser.Scene {
+  public static instance: Game
+
   public tileMap!: Phaser.Tilemaps.Tilemap
   public player!: Player
+  public cpu!: CPU
   public grid!: Grid
   public currTurn: Side = Side.PLAYER
+  public actionMenu!: ActionMenu
+  public turnsRemaining: number = 0
 
   constructor() {
     super('game')
+    Game.instance = this
+  }
+
+  create() {
+    this.cameras.main.setBackgroundColor('#dddddd')
+    this.cameras.main.setBounds(0, 0, Constants.GAME_WIDTH, Constants.GAME_HEIGHT)
+    this.initTilemap()
+    this.initGrid()
+    this.player = new Player(this)
+    this.cpu = new CPU(this)
+    this.actionMenu = new ActionMenu(this)
   }
 
   initTilemap() {
@@ -31,9 +50,9 @@ export class Game extends Phaser.Scene {
   }
 
   getAllLivingUnits() {
-    const livingPlayerUnits = this.player.party
-    // const livingCPUUnits = this.cpu.getLivingUnits()
-    return livingPlayerUnits
+    const livingPlayerUnits = this.player.livingUnits
+    const livingCPUUnits = this.cpu.livingUnits
+    return livingPlayerUnits.concat(livingCPUUnits)
   }
 
   unitAtPosition(row: number, col: number, currUnit: Squid) {
@@ -48,13 +67,28 @@ export class Game extends Phaser.Scene {
     return false
   }
 
+  setTurn(side: Side) {
+    if (this.turnsRemaining == 0) {
+      GameUI.instance.showGameOverModalAndDisplayResults()
+    } else {
+      this.currTurn = side
+      GameUI.instance.transitionTurn(() => {
+        if (side === Side.CPU) {
+          this.cpu.startTurn()
+        } else if (side === Side.PLAYER) {
+          this.player.startTurn()
+          this.turnsRemaining--
+        }
+      }, side === Side.PLAYER)
+    }
+  }
+
   initGrid() {
     this.grid = new Grid(this, {
       width: Constants.GAME_WIDTH,
       height: Constants.GAME_HEIGHT,
       cellSize: Constants.TILE_SIZE,
     })
-    this.grid.showGrid()
   }
 
   createLayer(layerName: string, tileset: Phaser.Tilemaps.Tileset) {
@@ -62,13 +96,6 @@ export class Game extends Phaser.Scene {
     layer.setOrigin(0)
     layer.setCollisionByExclusion([-1])
     return layer
-  }
-
-  create() {
-    this.cameras.main.setBackgroundColor('#dddddd')
-    this.initTilemap()
-    this.initGrid()
-    this.player = new Player(this)
   }
 
   panCameraIfNecessary(targetRow: number, targetCol: number) {

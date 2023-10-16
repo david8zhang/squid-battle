@@ -19,7 +19,7 @@ export class Cursor {
     this.game = game
     this.position = defaultPosition
     this.sprite = this.game.add
-      .sprite(this.position.x, this.position.y, 'cursor')
+      .sprite(this.position.x + 1, this.position.y + 1, 'cursor')
       .setDepth(100)
       .setDisplaySize(Constants.TILE_SIZE, Constants.TILE_SIZE)
       .setTint(0x00ff00)
@@ -28,13 +28,10 @@ export class Cursor {
       row: cell.gridRow,
       col: cell.gridCol,
     }
-    this.game.add.tween({
-      targets: this.sprite,
-      scale: { from: 2, to: 4 },
-      duration: 500,
-      yoyo: true,
-      repeat: -1,
-    })
+  }
+
+  setTexture(texture: string) {
+    this.sprite.setTexture(texture)
   }
 
   moveUnitsInDirection(direction: Direction, units: number) {
@@ -85,7 +82,7 @@ export class Cursor {
 
   moveToRowCol(row: number, col: number) {
     const cell = this.game.grid.getCellAtRowCol(row, col)
-    this.sprite.setPosition(cell.centerX, cell.centerY)
+    this.sprite.setPosition(cell.centerX + 1, cell.centerY + 1)
     this.gridRowColPosition = { row, col }
   }
 }
