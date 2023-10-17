@@ -1,8 +1,9 @@
 import { Game } from '~/scenes/Game'
-import { Constants } from '~/utils/Constants'
+import { Constants, PowerUpTypes } from '~/utils/Constants'
 import { Side } from '~/utils/Side'
 import { UIValueBar } from './UIValueBar'
 import { UINumber } from './UINumber'
+import { PowerUp, PowerUpConfig } from './PowerUp'
 
 export interface SquidConfig {
   position: {
@@ -25,6 +26,12 @@ export class Squid {
   public possibleAttackableSquares: Phaser.GameObjects.Rectangle[] = []
   public attackableSquaresPostMove: Phaser.GameObjects.Rectangle[] = []
   public miniHPBar: UIValueBar
+  public knockdownTurns: number = Constants.KNOCKDOWN_TURNS
+  public knockdownCounterText!: Phaser.GameObjects.Text
+
+  private powerUpDuration!: Phaser.GameObjects.Text
+  public activePowerUp: PowerUpConfig | null = null
+  private powerUpTurns: number = -1
 
   constructor(game: Game, config: SquidConfig) {
     this.game = game
@@ -45,6 +52,32 @@ export class Squid {
       shouldChangeColor: true,
     })
     this.miniHPBar.setVisible(false)
+    this.setupKnockdownTurns()
+    this.setupPowerUp()
+  }
+
+  setupPowerUp() {
+    this.powerUpDuration = this.game.add
+      .text(this.sprite.x, this.sprite.y - this.sprite.displayHeight / 2, '', {
+        fontSize: '12px',
+        fontFamily: Constants.FONT_FAMILY,
+        color: 'white',
+      })
+      .setStroke('black', 5)
+      .setVisible(false)
+    Constants.centerText(this.sprite.x, this.powerUpDuration)
+  }
+
+  setupKnockdownTurns() {
+    this.knockdownCounterText = this.game.add
+      .text(this.sprite.x, this.sprite.y, `${this.knockdownTurns}`, {
+        fontSize: '20px',
+        color: 'white',
+        fontFamily: Constants.FONT_FAMILY,
+      })
+      .setStroke('black', 5)
+      .setDepth(this.sprite.depth + 10)
+      .setVisible(false)
   }
 
   public getRowCol() {
@@ -66,6 +99,15 @@ export class Squid {
       this.sprite.x - (this.sprite.displayWidth - 8) / 2,
       this.sprite.y + this.sprite.displayHeight / 2 - 6
     )
+    const rowColPos = this.getRowCol()
+    this.game.powerUps.forEach((powerUp) => {
+      const { row, col } = powerUp.getRowCol()
+      if (rowColPos.row == row && rowColPos.col == col) {
+        this.pickUpPowerUp(powerUp)
+      }
+    })
+    this.powerUpDuration.setPosition(this.sprite.x, this.sprite.y - this.sprite.displayHeight / 2)
+    Constants.centerText(this.sprite.x, this.powerUpDuration)
   }
 
   // Get all continugous squares with ink
@@ -103,7 +145,7 @@ export class Squid {
       })
     }
     return moveableSquares.filter((square) => {
-      return !this.game.getAllLivingUnits().find((unit) => {
+      return !this.game.getAllUnits().find((unit) => {
         if (unit !== this) {
           const { row, col } = unit.getRowCol()
           return square.row == row && square.col == col
@@ -227,7 +269,17 @@ export class Squid {
 
     const inkColor =
       this.side === Side.PLAYER ? Constants.PLAYER_INK_COLOR : Constants.CPU_INK_COLOR
-    tilesToInk = tilesToInk.concat(this.getTilesWithinDistance(rowColPos, 1))
+
+    const tile = this.game.tileMap.getTileAt(rowColPos.col, rowColPos.row)
+
+    // If we're standing in friendly ink, the ink spread is 2, otherwise it's only 1
+    let numTilesToSpreadTo = tile.tint == inkColor ? 2 : 1
+    // If we have a power up, increase ink spread by 1
+    if (this.activePowerUp && this.activePowerUp.name == PowerUpTypes.INK_UP) {
+      numTilesToSpreadTo++
+    }
+
+    tilesToInk = tilesToInk.concat(this.getTilesWithinDistance(rowColPos, numTilesToSpreadTo))
     tilesToInk.forEach(({ row, col }) => {
       const tile = this.game.tileMap.getTileAt(col, row)
       if (tile) {
@@ -238,8 +290,12 @@ export class Squid {
   }
 
   takeDamage(damage: number) {
+    let damageAfterPowerUp = damage
+    if (this.activePowerUp && this.activePowerUp.name === PowerUpTypes.DEF_UP) {
+      damageAfterPowerUp = Math.round(damage * 0.5)
+    }
     this.miniHPBar.setVisible(true)
-    this.currHealth = Math.max(0, this.currHealth - damage)
+    this.currHealth = Math.max(0, this.currHealth - damageAfterPowerUp)
     this.miniHPBar.setCurrValue(this.currHealth)
     this.game.time.addEvent({
       delay: 10,
@@ -257,16 +313,49 @@ export class Squid {
       },
     })
     UINumber.createNumber(
-      `-${damage}`,
+      `-${damageAfterPowerUp}`,
       this.game,
       this.sprite.x,
       this.sprite.y - this.sprite.displayHeight / 3,
       'red'
     )
     if (this.currHealth == 0) {
+      this.knockdownCounterText.setVisible(true)
+      this.knockdownCounterText.setPosition(this.sprite.x, this.sprite.y)
       this.sprite.setAlpha(0.35)
       this.sprite.setTexture('squid-knocked-out')
       this.miniHPBar.setVisible(false)
+
+      // Deactive active power ups
+      this.powerUpDuration.setVisible(false)
+      this.activePowerUp = null
+    }
+  }
+
+  decrementKnockdownTurns() {
+    if (this.knockdownTurns === 1) {
+      this.sprite.setAlpha(1)
+      this.sprite.setTexture('squid')
+      this.currHealth = this.maxHealth
+      this.miniHPBar.setCurrValue(this.currHealth)
+      this.knockdownTurns = Constants.KNOCKDOWN_TURNS
+      this.knockdownCounterText.setVisible(false)
+    } else {
+      this.knockdownTurns--
+    }
+    this.knockdownCounterText.setText(this.knockdownTurns.toString())
+  }
+
+  decrementPowerUpTurns() {
+    if (this.activePowerUp !== null) {
+      if (this.powerUpTurns == 1) {
+        this.activePowerUp = null
+        this.powerUpDuration.setVisible(false)
+      } else {
+        console.log('Went here!')
+        this.powerUpTurns--
+        this.powerUpDuration.setText(`${this.activePowerUp.name}: ${this.powerUpTurns}`)
+      }
     }
   }
 
@@ -293,8 +382,44 @@ export class Squid {
     })
   }
 
+  pickUpPowerUp(powerUp: PowerUp) {
+    switch (powerUp.config.name) {
+      case PowerUpTypes.HEAL: {
+        const totalHealAmt = this.maxHealth - this.currHealth
+        this.currHealth = this.maxHealth
+        this.miniHPBar.setCurrValue(this.currHealth)
+        UINumber.createNumber(
+          `+${totalHealAmt}`,
+          this.game,
+          this.sprite.x,
+          this.sprite.y - this.sprite.displayHeight / 2 + 10,
+          '#2ecc71'
+        )
+        this.miniHPBar.setVisible(false)
+        break
+      }
+      case PowerUpTypes.DEF_UP:
+      case PowerUpTypes.INK_UP:
+      case PowerUpTypes.ATK_UP: {
+        this.activePowerUp = powerUp.config
+        this.powerUpTurns = powerUp.config.turnDuration
+        this.powerUpDuration
+          .setText(`${powerUp.config.name}: ${powerUp.config.turnDuration}`)
+          .setVisible(true)
+        this.powerUpDuration.setPosition(
+          this.sprite.x,
+          this.sprite.y - this.sprite.displayHeight / 2 + 5
+        )
+        Constants.centerText(this.sprite.x, this.powerUpDuration)
+        break
+      }
+    }
+    powerUp.destroy()
+  }
+
   destroy() {
     this.sprite.destroy()
+    this.knockdownCounterText.destroy()
     this.miniHPBar.destroy()
   }
 }

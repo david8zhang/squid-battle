@@ -1,13 +1,16 @@
+import { Constants } from '~/utils/Constants'
+
 export class UINumber {
   static createNumber(str: string, scene: Phaser.Scene, x: number, y: number, color?: string) {
     const text = scene.add
       .text(x, y, str, {
-        fontSize: '30px',
+        fontSize: '20px',
+        fontFamily: Constants.FONT_FAMILY,
         color: color || 'red',
       })
       .setOrigin(0.5)
       .setDepth(5000)
-      .setStroke('black', 2)
+      .setStroke('black', 5)
     text.setName('InAir')
     scene.add.tween({
       targets: text,

@@ -73,6 +73,13 @@ export class CPU {
     this.game.time.delayedCall(1250, () => {
       this.moveNextUnit()
     })
+    this.party.forEach((squid) => {
+      if (squid.isKnockedOut) {
+        squid.decrementKnockdownTurns()
+      } else {
+        squid.decrementPowerUpTurns()
+      }
+    })
   }
 
   get livingUnits() {

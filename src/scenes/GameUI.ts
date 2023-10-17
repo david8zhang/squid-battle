@@ -220,7 +220,7 @@ export class GameUI extends Phaser.Scene {
     this.continueButton = new Button({
       scene: this,
       onClick: () => {
-        Game.instance.goToNextLevel()
+        Game.instance.handleRoundOver()
       },
       text: 'Continue',
       fontSize: '12px',

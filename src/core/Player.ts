@@ -1,7 +1,7 @@
 import { Squid } from '~/core/Squid'
 import { Game } from '../scenes/Game'
 import { Cursor } from '~/core/Cursor'
-import { Constants } from '~/utils/Constants'
+import { Constants, PowerUpTypes } from '~/utils/Constants'
 import { Direction } from '~/utils/Direction'
 import { Side } from '~/utils/Side'
 
@@ -131,6 +131,13 @@ export class Player {
     const firstUnit = this.livingUnits[0]
     this.game.cameras.main.pan(firstUnit.x, firstUnit.y, 1000, Phaser.Math.Easing.Sine.InOut)
     this.cursor.show()
+    this.party.forEach((squid) => {
+      if (squid.isKnockedOut) {
+        squid.decrementKnockdownTurns()
+      } else {
+        squid.decrementPowerUpTurns()
+      }
+    })
   }
 
   initParty() {
@@ -352,9 +359,14 @@ export class Player {
   }
 
   handleAttackSelectedTarget() {
-    const attackableEnemyUnits = this.selectedUnitToMove!.getAttackableEnemyUnits()
+    const currSquid = this.selectedUnitToMove!
+    const attackableEnemyUnits = currSquid.getAttackableEnemyUnits()
     const targetToAttack = attackableEnemyUnits[this.selectedAttackableUnitIndex]
-    targetToAttack.takeDamage(5)
+    if (currSquid.activePowerUp !== null && currSquid.activePowerUp.name == PowerUpTypes.ATK_UP) {
+      targetToAttack.takeDamage(10)
+    } else {
+      targetToAttack.takeDamage(5)
+    }
     this.completeUnitAction()
   }
 

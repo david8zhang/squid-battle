@@ -6,6 +6,7 @@ import { Squid } from '~/core/Squid'
 import { ActionMenu } from '~/core/ActionMenu'
 import { CPU } from '~/core/CPU'
 import { GameUI } from './GameUI'
+import { PowerUp } from '~/core/PowerUp'
 
 export class Game extends Phaser.Scene {
   public static instance: Game
@@ -18,6 +19,7 @@ export class Game extends Phaser.Scene {
   public actionMenu!: ActionMenu
   public turnsRemaining: number = Constants.TOTAL_TURNS
   public currLevelIndex: number = 0
+  public powerUps: PowerUp[] = []
 
   constructor() {
     super('game')
@@ -32,6 +34,43 @@ export class Game extends Phaser.Scene {
     this.player = new Player(this)
     this.cpu = new CPU(this)
     this.actionMenu = new ActionMenu(this)
+    this.initPowerups()
+  }
+
+  initPowerups() {
+    const layer = this.tileMap.getLayer('Ground')
+    const positions: string[] = []
+    for (let i = 0; i < layer.data.length; i++) {
+      for (let j = 0; j < layer.data[0].length; j++) {
+        positions.push(`${i},${j}`)
+      }
+    }
+    const allUnitPositions = new Set(
+      this.getAllUnits().map((squid) => {
+        const { row, col } = squid.getRowCol()
+        return `${row},${col}`
+      })
+    )
+    const validPowerUpPositions = positions.filter((pos) => {
+      return !allUnitPositions.has(pos)
+    })
+    const shuffledPositions = Phaser.Utils.Array.Shuffle(validPowerUpPositions)
+    for (let i = 0; i < Constants.NUM_POWER_UPS; i++) {
+      const powerUpPositions = shuffledPositions[i].split(',')
+      const tile = this.tileMap.getTileAt(
+        parseInt(powerUpPositions[1]),
+        parseInt(powerUpPositions[0])
+      )
+      const randomPowerUpConfig = Phaser.Utils.Array.GetRandom(Constants.POWER_UP_CONFIGS)
+      const newPowerUp = new PowerUp(this, {
+        position: {
+          x: tile.getCenterX(),
+          y: tile.getCenterY(),
+        },
+        ...randomPowerUpConfig,
+      })
+      this.powerUps.push(newPowerUp)
+    }
   }
 
   initTilemap() {
@@ -50,6 +89,12 @@ export class Game extends Phaser.Scene {
     }
   }
 
+  getAllUnits() {
+    const allPlayerUnits = this.player.party
+    const allCPUUnits = this.cpu.party
+    return allPlayerUnits.concat(allCPUUnits)
+  }
+
   getAllLivingUnits() {
     const livingPlayerUnits = this.player.livingUnits
     const livingCPUUnits = this.cpu.livingUnits
@@ -57,7 +102,7 @@ export class Game extends Phaser.Scene {
   }
 
   unitAtPosition(row: number, col: number, currUnit: Squid) {
-    const allUnits = this.getAllLivingUnits()
+    const allUnits = this.getAllUnits()
     for (let i = 0; i < allUnits.length; i++) {
       const unit = allUnits[i]
       const rowCol = unit.getRowCol()
@@ -144,6 +189,17 @@ export class Game extends Phaser.Scene {
     }
   }
 
+  handleRoundOver() {
+    const percentages = this.calculatePercentages()
+    if (percentages.playerPct < percentages.cpuPct) {
+      GameUI.instance.tweenGameOverModalOut(() => {
+        this.scene.start('game-over')
+      })
+    } else {
+      this.goToNextLevel()
+    }
+  }
+
   goToNextLevel() {
     this.turnsRemaining = Constants.TOTAL_TURNS
     if (this.currLevelIndex == Constants.ALL_CPU_PARTY_MEMBER_CONFIGS.length - 1) {
@@ -153,19 +209,27 @@ export class Game extends Phaser.Scene {
     } else {
       this.currLevelIndex++
       GameUI.instance.tweenGameOverModalOut(() => {
-        this.player.resetParty()
-        this.cpu.resetParty()
+        this.resetGame()
       })
-      const layer = this.tileMap.getLayer('Ground')
-      for (let i = 0; i < layer.data.length; i++) {
-        for (let j = 0; j < layer.data[0].length; j++) {
-          const tile = layer.data[i][j]
-          tile.tint = 0xffffff
-          tile.setAlpha(1)
-        }
-      }
-      this.currTurn = Side.PLAYER
-      this.player.startTurn()
     }
+  }
+
+  resetGame() {
+    this.player.resetParty()
+    this.cpu.resetParty()
+    this.powerUps.forEach((powerUp) => {
+      powerUp.destroy()
+    })
+    this.initPowerups()
+    const layer = this.tileMap.getLayer('Ground')
+    for (let i = 0; i < layer.data.length; i++) {
+      for (let j = 0; j < layer.data[0].length; j++) {
+        const tile = layer.data[i][j]
+        tile.tint = 0xffffff
+        tile.setAlpha(1)
+      }
+    }
+    this.currTurn = Side.PLAYER
+    this.player.startTurn()
   }
 }
