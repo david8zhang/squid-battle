@@ -281,10 +281,22 @@ export class Player {
     // Show action menu
     this.isSelectingAction = true
     const optionConfigs = this.getOptionConfigs()
+    const cell = this.game.grid.getCellAtWorldPosition(
+      this.selectedUnitToMove!.x,
+      this.selectedUnitToMove!.y
+    )
+
+    let menuXPos = this.selectedUnitToMove!.x + this.selectedUnitToMove!.displayWidth / 2 - 10
+    if (cell.gridCol >= this.game.grid.numCols - 2) {
+      menuXPos = this.selectedUnitToMove!.x - this.selectedUnitToMove!.displayWidth / 2 - 150
+    }
+
+    console.log(cell.gridCol)
+
     this.game.actionMenu.showMenu(
       optionConfigs,
       {
-        x: this.selectedUnitToMove!.x + this.selectedUnitToMove!.displayWidth / 2 + 10,
+        x: menuXPos,
         y: this.selectedUnitToMove!.y,
       },
       (optionLabel: ActionTypes) => {
