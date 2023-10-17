@@ -291,8 +291,6 @@ export class Player {
       menuXPos = this.selectedUnitToMove!.x - this.selectedUnitToMove!.displayWidth / 2 - 150
     }
 
-    console.log(cell.gridCol)
-
     this.game.actionMenu.showMenu(
       optionConfigs,
       {
@@ -371,6 +369,9 @@ export class Player {
   }
 
   handleAttackSelectedTarget() {
+    this.game.sound.play('punch', {
+      volume: 0.5,
+    })
     const currSquid = this.selectedUnitToMove!
     const attackableEnemyUnits = currSquid.getAttackableEnemyUnits()
     const targetToAttack = attackableEnemyUnits[this.selectedAttackableUnitIndex]

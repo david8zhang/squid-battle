@@ -27,6 +27,10 @@ export class Game extends Phaser.Scene {
   }
 
   create() {
+    this.sound.play('battle', {
+      volume: 0.5,
+      loop: true,
+    })
     this.cameras.main.setBackgroundColor('#dddddd')
     this.cameras.main.setBounds(0, 0, Constants.GAME_WIDTH, Constants.GAME_HEIGHT)
     this.initTilemap()

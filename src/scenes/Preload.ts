@@ -19,6 +19,13 @@ export class Preload extends Phaser.Scene {
     this.load.image('flask', 'power-ups/flask.png')
     this.load.image('shield', 'power-ups/shield.png')
     this.load.image('sword', 'power-ups/sword.png')
+
+    // Music
+    this.load.audio('title-bgm', 'music/title-bgm.mp3')
+    this.load.audio('battle', 'music/battle.mp3')
+    this.load.audio('punch', 'sfx/punch.mp3')
+    this.load.audio('splat', 'sfx/splat.mp3')
+    this.load.audio('powerup', 'sfx/powerup.wav')
   }
 
   create() {

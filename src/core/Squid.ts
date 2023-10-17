@@ -257,6 +257,9 @@ export class Squid {
   }
 
   spreadInkToTiles() {
+    this.game.sound.play('splat', {
+      volume: 0.5,
+    })
     const rowColPos = this.getRowCol()
 
     // We always ink the position we moved to
@@ -414,6 +417,9 @@ export class Squid {
         break
       }
     }
+    this.game.sound.play('powerup', {
+      volume: 1,
+    })
     powerUp.destroy()
   }
 

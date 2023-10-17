@@ -45,6 +45,7 @@ export class CPU {
           : []
         if (attackableEnemyUnits.length > 0) {
           const randomAttackableEnemyUnit = Phaser.Utils.Array.GetRandom(attackableEnemyUnits)
+          this.game.sound.play('punch', { volume: 0.5 })
           randomAttackableEnemyUnit.takeDamage(5)
         } else {
           const randomSquare = Phaser.Utils.Array.GetRandom(moveableSquares)
@@ -54,6 +55,7 @@ export class CPU {
             : []
           if (newAttackableUnits.length > 0) {
             const randomAttackableEnemyUnit = Phaser.Utils.Array.GetRandom(newAttackableUnits)
+            this.game.sound.play('punch', { volume: 0.5 })
             randomAttackableEnemyUnit.takeDamage(5)
           } else {
             unitToMove.spreadInkToTiles()

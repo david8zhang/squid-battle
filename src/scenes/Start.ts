@@ -25,6 +25,7 @@ export class Start extends Phaser.Scene {
       onClick: () => {
         this.scene.start('game')
         this.scene.start('game-ui')
+        this.sound.stopAll()
       },
       fontSize: '25px',
       fontFamily: 'Kaph',
@@ -35,6 +36,11 @@ export class Start extends Phaser.Scene {
       height: 50,
       text: 'Start',
       backgroundColor: 0xffffff,
+    })
+
+    this.sound.play('title-bgm', {
+      volume: 0.5,
+      loop: true,
     })
   }
 }
